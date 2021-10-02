@@ -4,7 +4,7 @@
 
 **Project status: unstable.**
 
-<br><p align="center"><img src="https://raw.githubusercontent.com/sradc/SmallPebble/master/pebbles.jpg"/></p><br>
+<br><p align="center"><img src="https://raw.githubusercontent.com/sradc/SmallPebble/master/assets/pebbles.jpg"/></p><br>
 
 SmallPebble is a minimal automatic differentiation and deep learning library written from scratch in [Python](https://www.python.org/), using [NumPy](https://numpy.org/)/[CuPy](https://cupy.dev/).
 
@@ -78,7 +78,7 @@ plt.show()
 ```
 
 
-![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/readme_files/readme_6_0.png)
+![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/assets/readme_6_0.png)
 
 
 
@@ -156,7 +156,7 @@ plt.show()
 
 
 
-![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/readme_files/readme_8_2.png)
+![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/assets/readme_8_2.png)
 
 
 ## Training a convolutional neural network on CIFAR-10, using CuPy
@@ -193,7 +193,7 @@ plt.show()
 ```
 
 
-![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/readme_files/readme_11_0.png)
+![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/assets/readme_11_0.png)
 
 
 
@@ -325,7 +325,7 @@ plt.show()
 
 
 
-![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/readme_files/readme_16_2.png)
+![png](https://raw.githubusercontent.com/sradc/SmallPebble/master/assets/readme_16_2.png)
 
 
 It looks like we could improve our results by training for longer. (And of course we could improve our model architecture.)
