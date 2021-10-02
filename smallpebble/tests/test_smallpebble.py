@@ -2,8 +2,10 @@
 Check results, and derivatives against numerical derivatives.
 """
 import pytest
-import smallpebble as sp
 import tensorflow as tf
+
+import smallpebble as sp
+from smallpebble.numerical_gradients import numgrads
 
 np = sp.np
 
@@ -25,7 +27,7 @@ def compare_results(args, sp_func, np_func, delta=1, eps=EPS):
     - SmallPebble function output against NumPy function output.
     - SmallPebble gradient against numerical gradient.
 
-    Notes: 
+    Notes:
     `delta` can be 1 for linear functions,
     but should otherwise be a very small number.
 
@@ -262,7 +264,9 @@ def generate_images_and_kernels(imagedims, kerndims):
     np.random.seed(0)
     n_images, imheight, imwidth, _ = imagedims
     kernheight, kernwidth, channels_in, channels_out = kerndims
-    images = np.random.random([n_images, imheight, imwidth, channels_in]).astype(np.float64)
+    images = np.random.random([n_images, imheight, imwidth, channels_in]).astype(
+        np.float64
+    )
     kernels = np.random.random([kernheight, kernwidth, channels_in, channels_out])
     kernels = kernels.astype(np.float64)
     return images, kernels
@@ -276,7 +280,10 @@ def test_conv2d_result():
         for padding in ["SAME", "VALID"]:
             strides = [stride, stride]
             result_sp = sp.conv2d(
-                sp.Variable(images), sp.Variable(kernels), padding=padding, strides=strides,
+                sp.Variable(images),
+                sp.Variable(kernels),
+                padding=padding,
+                strides=strides,
             )
             result_tf = tf.nn.conv2d(images, kernels, padding=padding, strides=strides)
             result_mean_error = np.mean(np.abs(result_sp.array - result_tf))
@@ -300,7 +307,9 @@ def test_conv2d_grads():
             print(padding)
 
             # Calculate convolution and gradients with revdiff:
-            result_sp = sp.conv2d(images_sp, kernels_sp, padding=padding, strides=strides)
+            result_sp = sp.conv2d(
+                images_sp, kernels_sp, padding=padding, strides=strides
+            )
 
             gradients_sp = sp.get_gradients(result_sp)
             grad_images_sp = gradients_sp[images_sp]
@@ -414,7 +423,7 @@ def test_operation_and_placeholder_gradients():
 
 
 def test_learnable_and_get_learnables():
-    """Test that sp.get_learnables correctly obtains 
+    """Test that sp.get_learnables correctly obtains
     sp.Variables that have been flagged by sp.learnable().
     """
     param_1 = sp.learnable(sp.Variable(np.array(5)))
@@ -433,6 +442,7 @@ def test_learnable_and_get_learnables():
 
 # ---------------- NEURAL NETWORKS
 
+
 def test_adam():
     a = sp.Variable(np.random.random([3, 5]))
     b = sp.Variable(np.random.random([5, 3]))
@@ -444,12 +454,11 @@ def test_adam():
         y_pred = sp.matmul(a, b)
         loss = sp.sum(sp.square(y_true - y_pred))
         losses.append(loss.array)
-        
+
         gradients = sp.get_gradients(loss)
         adam.training_step([a, b], gradients)
-    
-    assert np.all(np.diff(losses) < 0), 'Not converging.'
 
+    assert np.all(np.diff(losses) < 0), "Not converging."
 
 
 def test_sgd_step():
@@ -462,49 +471,16 @@ def test_sgd_step():
         y_pred = sp.matmul(a, b)
         loss = sp.sum(sp.square(y_true - y_pred))
         losses.append(loss.array)
-        
+
         gradients = sp.get_gradients(loss)
         sp.sgd_step([a, b], gradients)
-    
-    assert np.all(np.diff(losses) < 0), 'Not converging.'
 
-
+    assert np.all(np.diff(losses) < 0), "Not converging."
 
 
 # ---------------- UTIL
 
 
-def numgrads(func, args, n=1, delta=1e-6):
-    "Numerical nth derivatives of func w.r.t. args."
-    gradients = []
-    for i, arg in enumerate(args):
-
-        def func_i(a):
-            new_args = [x for x in args]
-            new_args[i] = a
-            return func(*new_args)
-
-        gradfunc = lambda a: numgrad(func_i, a, delta)
-
-        for _ in range(1, n):
-            prev_gradfunc = gradfunc
-            gradfunc = lambda a: numgrad(prev_gradfunc, a, delta)
-
-        gradients.append(gradfunc(arg))
-    return gradients
-
-
-def numgrad(func, a, delta=1e-6):
-    "Numerical gradient of func(a) at `a`."
-    grad = np.zeros(a.shape, a.dtype)
-    for index, _ in np.ndenumerate(grad):
-        delta_array = np.zeros(a.shape, a.dtype)
-        delta_array[index] = delta / 2
-        grad[index] = np.sum((func(a + delta_array) - func(a - delta_array)) / delta)
-    return grad
-
-
 def rmse(a: np.ndarray, b: np.ndarray):
     "Root mean square error."
     return np.sqrt(np.mean((a - b) ** 2))
-
